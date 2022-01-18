@@ -32,3 +32,15 @@ const (
 	FUNCTION TokenType = "FUNCTION"
 	LET      TokenType = "LET"
 )
+
+var keywards = map[string] TokenType{
+	"fn": FUNCTION,
+	"let": LET,
+}
+
+func LookupIdent(ident string) TokenType {
+	if tok, ok := keywards[ident]; ok {
+		return tok
+	}
+	return IDENT
+}
