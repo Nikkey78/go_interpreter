@@ -16,8 +16,18 @@ const (
 	INT   TokenType = "INT"
 
 	// Operators
-	ASSIGN TokenType = "="
-	PLUS   TokenType = "+"
+	ASSIGN   TokenType = "="
+	PLUS     TokenType = "+"
+	MINUS    TokenType = "-"
+	BANG     TokenType = "!"
+	ASTERISK TokenType = "*"
+	SLASH    TokenType = "/"
+
+	EQ TokenType = "=="
+	NOT_EQ TokenType = "!="
+
+	LT TokenType = "<"
+	GT TokenType = ">"
 
 	// Delimiters
 	COMMA     TokenType = ","
@@ -31,13 +41,24 @@ const (
 	// Keywords
 	FUNCTION TokenType = "FUNCTION"
 	LET      TokenType = "LET"
+	TRUE     TokenType = "TRUE"
+	FALSE    TokenType = "FALSE"
+	IF       TokenType = "IF"
+	ELSE     TokenType = "ELSE"
+	RETURN   TokenType = "RETURN"
 )
 
-var keywards = map[string] TokenType{
-	"fn": FUNCTION,
-	"let": LET,
+var keywards = map[string]TokenType{
+	"fn":     FUNCTION,
+	"let":    LET,
+	"true":   TRUE,
+	"false":  FALSE,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
 }
 
+//LookupIdent return keyword
 func LookupIdent(ident string) TokenType {
 	if tok, ok := keywards[ident]; ok {
 		return tok
