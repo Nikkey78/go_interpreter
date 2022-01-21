@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// testing LET statement
 func TestLetStatement(t *testing.T) {
 	input := `
 	let x = 5;
@@ -40,6 +41,36 @@ func TestLetStatement(t *testing.T) {
 			return
 		}
 	}
+}
+
+func TestReturnStatement(t *testing.T) {
+	input := `
+	return 5;
+	return 10;
+	return 993322;
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParserProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("program.Statement does not contain 3 statements. got=%d", len(program.Statements))
+	}
+
+	for _, stmt := range program.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("stmt not *ast.returnStatement. got=%T", stmt)
+			continue
+		}
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("returnStmt.TokenLiteral not 'return', got %q", returnStmt.TokenLiteral())
+		}
+	}
+
 }
 
 func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
