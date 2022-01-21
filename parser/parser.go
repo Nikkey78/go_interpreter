@@ -8,12 +8,15 @@ import (
 )
 
 type Parser struct {
-	l         *lexer.Lexer
-	curToken  token.Token
-	peekToken token.Token
-	errors    []string
+	l              *lexer.Lexer
+	curToken       token.Token
+	peekToken      token.Token
+	errors         []string
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns  map[token.TokenType]infixParseFn
 }
 
+// Methods of Parser
 func (p *Parser) NextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
@@ -102,6 +105,15 @@ func (p *Parser) peekError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
+func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[tokenType] = fn
+}
+
+func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
+	p.infixParseFns[tokenType] = fn
+}
+
+// functions
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
 		l:      l,
@@ -113,3 +125,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.NextToken()
 	return p
 }
+
+// PRATT parser
+type (
+	prefixParseFn func() ast.Expression
+	infixParseFn  func(ast.Expression) ast.Expression
+)
