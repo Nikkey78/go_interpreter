@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestLetStatement(t *testing.T){
+func TestLetStatement(t *testing.T) {
 	input := `
 	let x = 5;
 	let y = 10;
@@ -17,6 +17,8 @@ func TestLetStatement(t *testing.T){
 	p := New(l)
 
 	program := p.ParserProgram()
+	checkParseErrors(t, p)
+
 	if program == nil {
 		t.Fatal("ParseProgram() returned nill")
 	}
@@ -24,7 +26,7 @@ func TestLetStatement(t *testing.T){
 		t.Fatalf("program.Statements does not contain 3 statements. got=%d", len(program.Statements))
 	}
 
-	tests := []struct{
+	tests := []struct {
 		expectedIdentifier string
 	}{
 		{"x"},
@@ -40,7 +42,7 @@ func TestLetStatement(t *testing.T){
 	}
 }
 
-func testLetStatement(t *testing.T, s ast.Statement, name string) bool{
+func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	if s.TokenLiteral() != "let" {
 		t.Errorf("s.TokenLiteral not 'let'. got=%q", s.TokenLiteral())
 		return false
@@ -62,4 +64,17 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool{
 		return false
 	}
 	return true
+}
+
+func checkParseErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+
+	if len(errors) == 0 {
+		return
+	}
+	t.Errorf("parser has %d errors", len(errors))
+	for _, msg := range errors {
+		t.Errorf("parser error: %q", msg)
+	}
+	t.FailNow()
 }
