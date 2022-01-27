@@ -305,55 +305,55 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 
 }
 
-func TestIfExpression(t *testing.T) {
-	
-	input := `if (x < y) { x }`
+// func TestIfExpression(t *testing.T) {
 
-	l := lexer.New(input)
-	p := New(l)
-	program := p.ParseProgram()
-	checkParserErrors(t, p)
+// 	input := `if (x < y) { x }`
 
-	if len(program.Statements) != 1 {
-		t.Fatalf("program.Body does not contain %d statements. got=%d\n",
-			1, len(program.Statements))
-	}
+// 	l := lexer.New(input)
+// 	p := New(l)
+// 	program := p.ParseProgram()
+// 	checkParserErrors(t, p)
 
-	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
-	if !ok {
-		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T", program.Statements[0])
-	}
+// 	if len(program.Statements) != 1 {
+// 		t.Fatalf("program.Body does not contain %d statements. got=%d\n", 1, len(program.Statements))
+// 	}
 
-	exp, ok := stmt.Expression.(*ast.IfExpression)
-	if !ok {
-		t.Fatalf("stmt.Expression is not ast.IfExpression. got=%T", stmt.Expression)
-	}
+// 	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 
-	if !testInfixExpression(t, exp.Condition, "x", "<", "y") {
-		return
-	}
+// 	if !ok {
+// 		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T", program.Statements[0])
+// 	}
 
-	if len(exp.Consequence.Statements) != 1 {
-		t.Errorf("consequence is not 1 statements. got=%d\n", len(exp.Consequence.Statements))
-	}
+// 	exp, ok := stmt.Expression.(*ast.IfExpression)
+// 	if !ok {
+// 		t.Fatalf("stmt.Expression is not ast.IfExpression. got=%T", stmt.Expression)
+// 	}
 
-	consequence, ok := exp.Consequence.Statements[0].(*ast.ExpressionStatement)
+// 	if !testInfixExpression(t, exp.Condition, "x", "<", "y") {
+// 		return
+// 	}
 
-	if !ok {
-		t.Fatalf("Statements[0] is not ast.ExpressionStatement. got=%T", exp.Consequence.Statements[0])
-	}
+// 	if len(exp.Consequence.Statements) != 1 {
+// 		t.Errorf("consequence is not 1 statements. got=%d\n", len(exp.Consequence.Statements))
+// 	}
 
-	if !testIdentifier(t, consequence.Expression, "x") {
-		return
-	}
+// 	consequence, ok := exp.Consequence.Statements[0].(*ast.ExpressionStatement)
 
-	if exp.Alternative != nil {
-		t.Errorf("exp.Alternative.Statements was not nil. got=%+v", exp.Alternative)
-	}
-}
+// 	if !ok {
+// 		t.Fatalf("Statements[0] is not ast.ExpressionStatement. got=%T", exp.Consequence.Statements[0])
+// 	}
+
+// 	if !testIdentifier(t, consequence.Expression, "x") {
+// 		return
+// 	}
+
+// 	if exp.Alternative != nil {
+// 		t.Errorf("exp.Alternative.Statements was not nil. got=%+v", exp.Alternative)
+// 	}
+// }
 
 func TestIfElseExpression(t *testing.T) {
-	
+
 	input := `if (x < y) { x } else { y }`
 
 	l := lexer.New(input)
@@ -385,7 +385,6 @@ func TestIfElseExpression(t *testing.T) {
 	}
 
 	consequence, ok := exp.Consequence.Statements[0].(*ast.ExpressionStatement)
-
 	if !ok {
 		t.Fatalf("Statements[0] is not ast.ExpressionStatement. got=%T", exp.Consequence.Statements[0])
 	}
@@ -394,8 +393,13 @@ func TestIfElseExpression(t *testing.T) {
 		return
 	}
 
-	if exp.Alternative != nil {
-		t.Errorf("exp.Alternative.Statements was not nil. got=%+v", exp.Alternative)
+	alternative, ok := exp.Alternative.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("Statements[0] is not ast.ExpressionStatement. got=%T", exp.Alternative.Statements[0])
+	}
+
+	if !testIdentifier(t, alternative.Expression, "y") {
+		return
 	}
 }
 
@@ -510,8 +514,7 @@ func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{
 	return false
 }
 
-func testInfixExpression(t *testing.T, exp ast.Expression, left interface{},
-	operator string, right interface{}) bool {
+func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, operator string, right interface{}) bool {
 
 	opExp, ok := exp.(*ast.InfixExpression)
 	if !ok {
@@ -519,7 +522,7 @@ func testInfixExpression(t *testing.T, exp ast.Expression, left interface{},
 		return false
 	}
 
-	if !testLiteralExpression(t, opExp, left) {
+	if !testLiteralExpression(t, opExp.Left, left) {
 		return false
 	}
 
