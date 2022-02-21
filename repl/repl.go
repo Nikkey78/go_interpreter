@@ -3,6 +3,7 @@ package repl
 import (
 	"bufio"
 	"console"
+	"interpreter/evaluator"
 	"interpreter/lexer"
 	"interpreter/parser"
 	"io"
@@ -14,6 +15,7 @@ func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
 	for {
+		// fmt.Println(PROMPT)
 		console.ColorPrint(console.Color_Yellow, PROMPT)
 		scanned := scanner.Scan()
 		if !scanned {
@@ -29,8 +31,11 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		evaluated := evaluator.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 
